@@ -30,8 +30,8 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
-  # Pages 同步 - 将静态文件同步到 gh-pages 分支
-  sync-pages:
+  # Pages 部署 - 使用 wrangler 直接部署到 Cloudflare Pages
+  deploy-pages:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -39,14 +39,15 @@ jobs:
         with:
           ref: main
 
-      - name: Copy static files to root
-        run: |
-          # 创建 Pages 专用文件（从 cloudflare-pages 目录）
-          cp cloudflare-pages/index.html index.html 2>/dev/null || echo "cloudflare-pages not found"
-          
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: ./cloudflare-pages
+          node-version: '20'
+
+      - name: Install Wrangler
+        run: npm install -g wrangler
+
+      - name: Deploy to Cloudflare Pages
+        run: wrangler pages deploy cloudflare-pages/
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
