@@ -1,6 +1,6 @@
 # 📚 书海猎手 - Cloudflare Workers 部署指南
 
-一个基于 Cloudflare Workers 的国内热门书籍实时搜索应用。
+> v1.0.0 | 一个基于 Cloudflare Workers 的国内热门书籍实时搜索应用。
 
 ## 功能特性
 
