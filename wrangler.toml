@@ -5,11 +5,6 @@ compatibility_date = "2024-01-01"
 [site]
 bucket = "./public"
 
-# KV 命名空间用于缓存书籍数据
-[[kv_namespaces]]
-binding = "BOOKS_CACHE"
-id = ""
-
-# 开发时使用模拟数据，生产环境需创建真实的 KV namespace
+# 开发时使用模拟数据
 [vars]
 USE_MOCK_DATA = "true"
