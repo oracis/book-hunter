@@ -10,27 +10,46 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Go (for ossutil)
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.22'
+      - name: Install Python and oss2 SDK
+        run: pip install oss2
 
-      - name: Install ossutil
+      - name: Upload to OSS
+        env:
+          OSS_ACCESS_KEY_ID: ${{ secrets.OSS_ACCESS_KEY_ID }}
+          OSS_ACCESS_KEY_SECRET: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
+          OSS_BUCKET: ${{ secrets.OSS_BUCKET }}
         run: |
-          go install github.com/aliyun/ossutil/cmd/ossutil@latest
-          echo "$HOME/go/bin" >> $GITHUB_PATH
+          python << 'EOF'
+          import oss2
+          import os
 
-      - name: Configure ossutil
-        run: |
-          ossutil config \
-            --endpoint ${{ secrets.OSS_ENDPOINT }} \
-            --access-key-id ${{ secrets.OSS_ACCESS_KEY_ID }} \
-            --access-key-secret ${{ secrets.OSS_ACCESS_KEY_SECRET }} \
-            --config-file .ossutilconfig
+          auth = oss2.Auth(os.environ['OSS_ACCESS_KEY_ID'], os.environ['OSS_ACCESS_KEY_SECRET'])
+          bucket = oss2.Bucket(auth, 'oss-cn-hongkong.aliyuncs.com', os.environ['OSS_BUCKET'])
 
-      - name: Sync to OSS
-        run: |
-          ossutil cp -r --force ./aliyun-oss/ oss://${{ secrets.OSS_BUCKET }}/ \
-            --config-file .ossutilconfig \
-            --delete \
-            -f
+          mime_types = {
+              '.html': 'text/html',
+              '.css': 'text/css',
+              '.js': 'application/javascript',
+              '.json': 'application/json',
+              '.png': 'image/png',
+              '.jpg': 'image/jpeg',
+              '.jpeg': 'image/jpeg',
+              '.gif': 'image/gif',
+              '.svg': 'image/svg+xml',
+              '.ico': 'image/x-icon',
+              '.woff': 'font/woff',
+              '.woff2': 'font/woff2',
+              '.ttf': 'font/ttf',
+              '.eot': 'application/vnd.ms-fontobject',
+          }
+
+          for root, dirs, files in os.walk('public'):
+              for f in files:
+                  filepath = os.path.join(root, f)
+                  oss_key = filepath.replace('public/', '', 1).lstrip('/')
+                  ext = os.path.splitext(f)[1].lower()
+                  content_type = mime_types.get(ext, 'application/octet-stream')
+                  headers = {'Content-Type': content_type}
+                  bucket.put_object_from_file(oss_key, filepath, headers=headers)
+                  print(f'Uploaded: {oss_key}')
+          EOF
