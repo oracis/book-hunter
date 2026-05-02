@@ -18,7 +18,7 @@ PUBLIC_HTML = os.path.join(BASE_DIR, "public", "index.html")
 
 
 def format_js_array(books):
-    """把 books 列表格式化为 JS 数组字符串"""
+    """把 books 列表格式化为 JS 数组字符串（4 空格缩进，与 public/index.html 格式一致）"""
     lines = ["const BOOKS = ["]
     for i, b in enumerate(books):
         title = b["title"].replace("'", "\\'")
@@ -31,21 +31,21 @@ def format_js_array(books):
         if not category:
             print(f"  ⚠ 缺 category: {title}")
         entry = (
-            "  {{ title: '{}', author: '{}', "
+            "    {{ title: '{}', author: '{}', "
             "source: '{}', rating: '{}', year: '{}', category: '{}' }}"
         ).format(title, author, source, rating, year, category)
         if i < len(books) - 1:
             entry += ","
         lines.append(entry)
-    lines.append("];")
+    lines.append("    ];")
     return "\n".join(lines)
 
 
 def update_src_js(books_js_str):
     with open(SRC_JS, "r", encoding="utf-8") as f:
         content = f.read()
-    # 替换 const BOOKS = [ ... ]; 块
-    pattern = r"const BOOKS = \[[\s\S]*?\n\];"
+    # 支持 ]; 前面有缩进的情况
+    pattern = r"const BOOKS = \[[\s\S]*?\n\s*\];"
     new_content = re.sub(pattern, books_js_str, content, count=1)
     if new_content == content:
         print("  ❌ src/index.js: 未找到 BOOKS 数组，请检查格式")
@@ -59,7 +59,8 @@ def update_src_js(books_js_str):
 def update_public_html(books_js_str):
     with open(PUBLIC_HTML, "r", encoding="utf-8") as f:
         content = f.read()
-    pattern = r"const BOOKS = \[[\s\S]*?\n\];"
+    # 支持 ]; 前面有缩进的情况
+    pattern = r"const BOOKS = \[[\s\S]*?\n\s*\];"
     new_content = re.sub(pattern, books_js_str, content, count=1)
     if new_content == content:
         print("  ❌ public/index.html: 未找到 BOOKS 数组，请检查格式")
