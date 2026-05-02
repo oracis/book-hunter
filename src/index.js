@@ -77,6 +77,7 @@ const ZLIB_DOMAINS = [
   { name: 'z-lib.fm', note: '主域名', color: '#667eea' },
   { name: 'zh.z-lib.fm', note: '中文镜像', color: '#764ba2' },
   { name: '1lib.domains', note: '备用域名', color: '#11998e' },
+  { name: 'zh.vvv101.ru', note: '稳定可访问', color: '#f5576c' },
 ];
 
 // 搜索函数
