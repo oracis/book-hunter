@@ -1,0 +1,42 @@
+name: Daily Book Update
+
+on:
+  schedule:
+    # 每天 06:00 CST = 22:00 UTC
+    - cron: '0 22 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-books:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 lxml
+
+      - name: Scrape book list
+        run: python booklist_tracker.py
+
+      - name: Inject books into frontend
+        run: python inject_books.py
+
+      - name: Commit and push
+        run: |
+          git config --local user.name "GitHub Actions Bot"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git add books.json src/index.js public/index.html
+          # 只在没有实际变化时跳过提交（git diff --exit-code）
+          if ! git diff --exit-code --quiet; then
+            git commit -m "chore: 自动更新书籍数据 $(date '+%Y-%m-%d %H:%M')"
+            git push
+          else
+            echo "📭 书单无变化，跳过提交"
+          fi

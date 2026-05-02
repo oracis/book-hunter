@@ -70,7 +70,7 @@ const BOOKS = [
 ];
 
 // 分类列表
-const CATEGORIES = ['全部', '文学', '科幻', '历史', '社科', '心理', '成长', '经管', '技术'];
+const CATEGORIES = ['全部', '文学', '科幻', '历史', '社科', '心理', '成长', '经管', '技术', '其他'];
 
 // Z-Library 域名列表
 const ZLIB_DOMAINS = [
