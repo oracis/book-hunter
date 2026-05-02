@@ -143,10 +143,13 @@
     .modal {
       background: white; border-radius: 20px;
       max-width: 520px; width: 100%;
-      max-height: 85vh;
-      overflow-y: auto;
       box-shadow: 0 20px 60px rgba(0,0,0,0.3);
       position: relative;
+    }
+    .modal-scroll {
+      max-height: 85vh;
+      overflow-y: auto;
+      border-radius: 20px;
     }
     .modal-header {
       background: linear-gradient(135deg, #667eea, #764ba2);
@@ -269,69 +272,71 @@
         <h3>📥 获取这本书</h3>
         <p id="modalBookAuthor"></p>
       </div>
-      <div class="modal-body">
-        <div class="modal-book-title" id="modalBookTitle"></div>
+      <div class="modal-scroll">
+        <div class="modal-body">
+          <div class="modal-book-title" id="modalBookTitle"></div>
 
-        <div class="modal-section-title">📡 Z-Library 镜像域名</div>
-        <div class="mirror-list" id="mirrorList"></div>
+          <div class="modal-section-title">📡 Z-Library 镜像域名</div>
+          <div class="mirror-list" id="mirrorList"></div>
 
-        <div class="no-proxy-section">
-          <div class="no-proxy-title">🌐 无代理访问方式</div>
+          <div class="no-proxy-section">
+            <div class="no-proxy-title">🌐 无代理访问方式</div>
 
-          <div class="no-proxy-item">
-            <span class="no-proxy-icon">📧</span>
-            <div class="no-proxy-text">
-              <strong>Magic Email 邮件获取</strong>
-              <span>发任意邮件到 blackbox@z-library.se，自动收到个人访问链接</span>
+            <div class="no-proxy-item">
+              <span class="no-proxy-icon">📧</span>
+              <div class="no-proxy-text">
+                <strong>Magic Email 邮件获取</strong>
+                <span>发任意邮件到 blackbox@z-library.se，自动收到个人访问链接</span>
+              </div>
+              <a href="mailto:blackbox@z-library.se" class="no-proxy-btn">发邮件</a>
             </div>
-            <a href="mailto:blackbox@z-library.se" class="no-proxy-btn">发邮件</a>
-          </div>
 
-          <div class="no-proxy-item">
-            <span class="no-proxy-icon">🦊</span>
-            <div class="no-proxy-text">
-              <strong>Firefox 浏览器扩展</strong>
-              <span>安装 Z-Library Browser Companion 扩展，自动处理域名切换</span>
+            <div class="no-proxy-item">
+              <span class="no-proxy-icon">🦊</span>
+              <div class="no-proxy-text">
+                <strong>Firefox 浏览器扩展</strong>
+                <span>安装 Z-Library Browser Companion 扩展，自动处理域名切换</span>
+              </div>
+              <a href="https://addons.mozilla.org/zh-CN/firefox/addon/zlibrary-browser-companion/" target="_blank" class="no-proxy-btn">获取</a>
             </div>
-            <a href="https://addons.mozilla.org/zh-CN/firefox/addon/zlibrary-browser-companion/" target="_blank" class="no-proxy-btn">获取</a>
-          </div>
 
-          <div class="no-proxy-item">
-            <span class="no-proxy-icon">🌑</span>
-            <div class="no-proxy-text">
-              <strong>Tor Browser（暗网 .onion）</strong>
-              <span>下载 Tor Browser，访问 Z-Library .onion 地址，无需任何代理</span>
+            <div class="no-proxy-item">
+              <span class="no-proxy-icon">🌑</span>
+              <div class="no-proxy-text">
+                <strong>Tor Browser（暗网 .onion）</strong>
+                <span>下载 Tor Browser，访问 Z-Library .onion 地址，无需任何代理</span>
+              </div>
+              <a href="https://www.torproject.org/download/" target="_blank" class="no-proxy-btn">下载</a>
             </div>
-            <a href="https://www.torproject.org/download/" target="_blank" class="no-proxy-btn">下载</a>
-          </div>
 
-          <div class="no-proxy-item">
-            <span class="no-proxy-icon">🌐</span>
-            <div class="no-proxy-text">
-              <strong>Z-Access 聚合页</strong>
-              <span>官方提供的最新可用域名汇总页面</span>
+            <div class="no-proxy-item">
+              <span class="no-proxy-icon">🌐</span>
+              <div class="no-proxy-text">
+                <strong>Z-Access 聚合页</strong>
+                <span>官方提供的最新可用域名汇总页面</span>
+              </div>
+              <a href="https://library-access.sk/" target="_blank" class="no-proxy-btn">访问</a>
             </div>
-            <a href="https://library-access.sk/" target="_blank" class="no-proxy-btn">访问</a>
-          </div>
 
-          <div class="no-proxy-item">
-            <span class="no-proxy-icon">📮</span>
-            <div class="no-proxy-text">
-              <strong>Reddit 社区</strong>
-              <span>r/zlibrary 社区用户分享最新可用域名和访问方法</span>
+            <div class="no-proxy-item">
+              <span class="no-proxy-icon">📮</span>
+              <div class="no-proxy-text">
+                <strong>Reddit 社区</strong>
+                <span>r/zlibrary 社区用户分享最新可用域名和访问方法</span>
+              </div>
+              <a href="https://www.reddit.com/r/zlibrary/" target="_blank" class="no-proxy-btn">查看</a>
             </div>
-            <a href="https://www.reddit.com/r/zlibrary/" target="_blank" class="no-proxy-btn">查看</a>
+
+            <div class="email-box">
+              💡 <strong>最简单方法：</strong>发一封邮件到
+              <a href="mailto:blackbox@z-library.se">blackbox@z-library.se</a>
+              （任意主题/正文），几秒内收到回复，内含个人访问链接。
+            </div>
           </div>
 
-          <div class="email-box">
-            💡 <strong>最简单方法：</strong>发一封邮件到
-            <a href="mailto:blackbox@z-library.se">blackbox@z-library.se</a>
-            （任意主题/正文），几秒内收到回复，内含个人访问链接。
+          <div class="mirror-tip">
+            💡 域名可能随时变化失效，推荐使用上方 <strong>无代理访问方式</strong> 获取最新链接。
           </div>
-        </div>
-
-        <div class="mirror-tip">
-          💡 域名可能随时变化失效，推荐使用上方 <strong>无代理访问方式</strong> 获取最新链接。
         </div>
       </div>
     </div>
