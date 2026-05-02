@@ -197,6 +197,35 @@
       color: #b77a00; line-height: 1.5;
     }
 
+    .no-proxy-section {
+      background: #f0f7ff; border-radius: 12px;
+      padding: 14px 16px; margin-bottom: 12px;
+    }
+    .no-proxy-title { font-size: 0.9rem; font-weight: 600; color: #1a73e8; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .no-proxy-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 0; border-bottom: 1px solid #e8f0fe;
+    }
+    .no-proxy-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .no-proxy-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+    .no-proxy-text { flex: 1; }
+    .no-proxy-text strong { font-size: 0.88rem; color: #333; display: block; margin-bottom: 2px; }
+    .no-proxy-text span { font-size: 0.78rem; color: #666; line-height: 1.4; }
+    .no-proxy-btn {
+      background: #1a73e8; color: white; text-decoration: none;
+      padding: 4px 10px; border-radius: 14px;
+      font-size: 0.75rem; font-weight: 500; flex-shrink: 0; white-space: nowrap;
+    }
+    .no-proxy-btn:hover { background: #1557b0; }
+
+    .email-box {
+      background: #fff3e0; border-radius: 10px;
+      padding: 10px 14px; margin-top: 10px;
+      font-size: 0.8rem; color: #555;
+    }
+    .email-box strong { color: #e65100; }
+    .email-box a { color: #1a73e8; font-weight: 600; }
+
     @media (max-width: 640px) {
       header h1 { font-size: 1.6rem; }
       .book-item { flex-wrap: wrap; }
@@ -242,21 +271,66 @@
       <div class="modal-body">
         <div class="modal-book-title" id="modalBookTitle"></div>
 
-        <div class="modal-section-title">Z-Library 镜像域名（需代理）</div>
+        <div class="modal-section-title">📡 Z-Library 镜像域名</div>
         <div class="mirror-list" id="mirrorList"></div>
 
-        <div class="tor-section">
-          <div class="tor-title">🌐 无代理访问 — Tor 浏览器</div>
-          <div class="tor-desc">
-            Z-Library 的 .onion 地址可通过 <a class="tor-link" href="https://www.torproject.org/download/" target="_blank">Tor Browser</a> 直接访问，全程加密，无需任何代理。
-            <br>访问 <a class="tor-link" href="https://zlibrary-official.com" target="_blank">zlibrary-official.com</a> 查找最新 .onion 地址。
+        <div class="no-proxy-section">
+          <div class="no-proxy-title">🌐 无代理访问方式</div>
+
+          <div class="no-proxy-item">
+            <span class="no-proxy-icon">📧</span>
+            <div class="no-proxy-text">
+              <strong>Magic Email 邮件获取</strong>
+              <span>发任意邮件到 blackbox@z-library.se，自动收到个人访问链接</span>
+            </div>
+            <a href="mailto:blackbox@z-library.se" class="no-proxy-btn">发邮件</a>
+          </div>
+
+          <div class="no-proxy-item">
+            <span class="no-proxy-icon">🦊</span>
+            <div class="no-proxy-text">
+              <strong>Firefox 浏览器扩展</strong>
+              <span>安装 Z-Library Browser Companion 扩展，自动处理域名切换</span>
+            </div>
+            <a href="https://addons.mozilla.org/zh-CN/firefox/addon/zlibrary-browser-companion/" target="_blank" class="no-proxy-btn">获取</a>
+          </div>
+
+          <div class="no-proxy-item">
+            <span class="no-proxy-icon">🌑</span>
+            <div class="no-proxy-text">
+              <strong>Tor Browser（暗网 .onion）</strong>
+              <span>下载 Tor Browser，访问 Z-Library .onion 地址，无需任何代理</span>
+            </div>
+            <a href="https://www.torproject.org/download/" target="_blank" class="no-proxy-btn">下载</a>
+          </div>
+
+          <div class="no-proxy-item">
+            <span class="no-proxy-icon">🌐</span>
+            <div class="no-proxy-text">
+              <strong>Z-Access 聚合页</strong>
+              <span>官方提供的最新可用域名汇总页面</span>
+            </div>
+            <a href="https://zaccess.pages.dev/" target="_blank" class="no-proxy-btn">访问</a>
+          </div>
+
+          <div class="no-proxy-item">
+            <span class="no-proxy-icon">📮</span>
+            <div class="no-proxy-text">
+              <strong>Reddit 社区</strong>
+              <span>r/zlibrary 社区用户分享最新可用域名和访问方法</span>
+            </div>
+            <a href="https://www.reddit.com/r/zlibrary/" target="_blank" class="no-proxy-btn">查看</a>
+          </div>
+
+          <div class="email-box">
+            💡 <strong>最简单方法：</strong>发一封邮件到
+            <a href="mailto:blackbox@z-library.se">blackbox@z-library.se</a>
+            （任意主题/正文），几秒内收到回复，内含个人访问链接。
           </div>
         </div>
 
         <div class="mirror-tip">
-          💡 <strong>提示：</strong>Z-Library 域名可能随时变化。如遇链接失效，请访问
-          <a href="https://zlibrary-official.com" target="_blank" style="color:#b77a00;">zlibrary-official.com</a>
-          获取最新域名。
+          💡 域名可能随时变化失效，推荐使用上方 <strong>无代理访问方式</strong> 获取最新链接。
         </div>
       </div>
     </div>
@@ -269,61 +343,71 @@
       { name: 'z-lib.fm', note: '主域名', color: '#667eea' },
       { name: 'zh.z-lib.fm', note: '中文镜像', color: '#764ba2' },
       { name: '1lib.domains', note: '备用域名', color: '#11998e' },
-      { name: 'b-ok.cc', note: '旧域名', color: '#f093fb' },
     ];
 
     const BOOKS = [
-      { title: '活着', author: '余华', source: '当当网', rating: '9.4', year: '2012', category: '文学' },
-      { title: '平凡的世界', author: '路遥', source: '当当网', rating: '9.0', year: '2017', category: '文学' },
-      { title: '三体', author: '刘慈欣', source: '豆瓣', rating: '9.5', year: '2021', category: '科幻' },
-      { title: '百年孤独', author: '加西亚·马尔克斯', source: '当当网', rating: '9.3', year: '2011', category: '文学' },
-      { title: '小王子', author: '圣埃克苏佩里', source: '当当网', rating: '9.7', year: '2018', category: '文学' },
-      { title: '追风筝的人', author: '卡勒德·胡赛尼', source: '当当网', rating: '9.1', year: '2019', category: '文学' },
-      { title: '解忧杂货店', author: '东野圭吾', source: '豆瓣', rating: '8.5', year: '2024', category: '文学' },
-      { title: '挪威的森林', author: '村上春树', source: '当当网', rating: '8.8', year: '2020', category: '文学' },
-      { title: '月亮与六便士', author: '毛姆', source: '当当网', rating: '9.0', year: '2019', category: '文学' },
-      { title: '局外人', author: '加缪', source: '当当网', rating: '9.1', year: '2021', category: '文学' },
-      { title: '卡拉马佐夫兄弟', author: '陀思妥耶夫斯基', source: '当当网', rating: '9.4', year: '2020', category: '文学' },
-      { title: '呼啸山庄', author: '艾米莉·勃朗特', source: '当当网', rating: '8.9', year: '2018', category: '文学' },
-      { title: '人类简史', author: '尤瓦尔·赫拉利', source: '京东', rating: '9.1', year: '2022', category: '社科' },
-      { title: '中国哲学简史', author: '冯友兰', source: '豆瓣', rating: '9.3', year: '2024', category: '社科' },
-      { title: '万历十五年', author: '黄仁宇', source: '当当网', rating: '9.2', year: '2022', category: '历史' },
-      { title: '明朝那些事儿', author: '当年明月', source: '京东', rating: '9.2', year: '2023', category: '历史' },
-      { title: '全球通史', author: '斯塔夫里阿诺斯', source: '当当网', rating: '9.0', year: '2021', category: '历史' },
-      { title: '乌合之众', author: '古斯塔夫·勒庞', source: '京东', rating: '8.6', year: '2023', category: '社科' },
-      { title: '社会心理学', author: '戴维·迈尔斯', source: '京东', rating: '9.2', year: '2022', category: '社科' },
-      { title: '乡土中国', author: '费孝通', source: '当当网', rating: '9.0', year: '2023', category: '社科' },
-      { title: '枪炮、病菌与钢铁', author: '贾雷德·戴蒙德', source: '当当网', rating: '9.1', year: '2021', category: '社科' },
-      { title: '被讨厌的勇气', author: '岸见一郎', source: '当当网', rating: '8.8', year: '2023', category: '心理' },
-      { title: '蛤蟆先生去看心理医生', author: '罗伯特·戴博德', source: '豆瓣', rating: '8.7', year: '2024', category: '心理' },
-      { title: '自卑与超越', author: '阿德勒', source: '豆瓣', rating: '8.7', year: '2024', category: '心理' },
-      { title: '思考快与慢', author: '丹尼尔·卡尼曼', source: '当当网', rating: '9.1', year: '2022', category: '心理' },
-      { title: '亲密关系', author: '罗兰·米勒', source: '当当网', rating: '9.0', year: '2023', category: '心理' },
-      { title: '非暴力沟通', author: '马歇尔·卢森堡', source: '豆瓣', rating: '8.9', year: '2024', category: '心理' },
-      { title: '影响力', author: '罗伯特·西奥迪尼', source: '豆瓣', rating: '8.9', year: '2024', category: '心理' },
-      { title: '认知觉醒', author: '周岭', source: '豆瓣', rating: '8.6', year: '2024', category: '成长' },
-      { title: '原则', author: '瑞·达利欧', source: '京东', rating: '8.9', year: '2022', category: '成长' },
-      { title: '穷爸爸富爸爸', author: '罗伯特·清崎', source: '当当网', rating: '8.5', year: '2023', category: '成长' },
-      { title: '高效能人士的七个习惯', author: '史蒂芬·柯维', source: '京东', rating: '9.0', year: '2021', category: '成长' },
-      { title: '刻意练习', author: '安德斯·艾利克森', source: '京东', rating: '8.8', year: '2023', category: '成长' },
-      { title: '终身成长', author: '卡罗尔·德韦克', source: '当当网', rating: '8.7', year: '2024', category: '成长' },
-      { title: '深度工作', author: '卡尔·纽波特', source: '当当网', rating: '8.6', year: '2023', category: '成长' },
-      { title: '原子习惯', author: '詹姆斯·克利尔', source: '豆瓣', rating: '9.0', year: '2024', category: '成长' },
-      { title: '置身事内', author: '兰小欢', source: '豆瓣', rating: '9.1', year: '2024', category: '经管' },
-      { title: '薛兆丰经济学讲义', author: '薛兆丰', source: '当当网', rating: '8.8', year: '2023', category: '经管' },
-      { title: '牛奶可乐经济学', author: '罗伯特·弗兰克', source: '当当网', rating: '8.5', year: '2022', category: '经管' },
-      { title: '从零到一', author: '彼得·蒂尔', source: '京东', rating: '8.6', year: '2023', category: '经管' },
-      { title: '创业维艰', author: '本·霍洛维茨', source: '当当网', rating: '9.0', year: '2021', category: '经管' },
-      { title: '价值', author: '张磊', source: '当当网', rating: '8.7', year: '2023', category: '经管' },
-      { title: 'Python编程 从入门到实践', author: '埃里克·马瑟斯', source: '京东', rating: '9.0', year: '2023', category: '技术' },
-      { title: '设计模式', author: '程杰', source: '当当网', rating: '9.4', year: '2020', category: '技术' },
-      { title: 'JavaScript高级程序设计', author: '马特·弗劳恩', source: '京东', rating: '9.2', year: '2023', category: '技术' },
-      { title: '算法导论', author: '托马斯·科尔曼', source: '当当网', rating: '9.3', year: '2022', category: '技术' },
-      { title: '深入理解计算机系统', author: '布莱恩·里森', source: '京东', rating: '9.4', year: '2023', category: '技术' },
-      { title: 'Python爬虫实战', author: '崔庆才', source: '豆瓣', rating: '8.8', year: '2024', category: '技术' },
-      { title: '机器学习', author: '周志华', source: '当当网', rating: '9.2', year: '2022', category: '技术' },
-      { title: '深度学习入门', author: '斋藤康毅', source: '京东', rating: '9.0', year: '2023', category: '技术' },
-    ];
+  // 文学经典
+  { title: '活着', author: '余华', source: '当当网', rating: '9.4', year: '2012', category: '文学' },
+  { title: '平凡的世界', author: '路遥', source: '当当网', rating: '9.0', year: '2017', category: '文学' },
+  { title: '三体', author: '刘慈欣', source: '豆瓣', rating: '9.5', year: '2021', category: '科幻' },
+  { title: '百年孤独', author: '加西亚·马尔克斯', source: '当当网', rating: '9.3', year: '2011', category: '文学' },
+  { title: '小王子', author: '圣埃克苏佩里', source: '当当网', rating: '9.7', year: '2018', category: '文学' },
+  { title: '追风筝的人', author: '卡勒德·胡赛尼', source: '当当网', rating: '9.1', year: '2019', category: '文学' },
+  { title: '解忧杂货店', author: '东野圭吾', source: '豆瓣', rating: '8.5', year: '2024', category: '文学' },
+  { title: '挪威的森林', author: '村上春树', source: '当当网', rating: '8.8', year: '2020', category: '文学' },
+  { title: '月亮与六便士', author: '毛姆', source: '当当网', rating: '9.0', year: '2019', category: '文学' },
+  { title: '局外人', author: '加缪', source: '当当网', rating: '9.1', year: '2021', category: '文学' },
+  { title: '卡拉马佐夫兄弟', author: '陀思妥耶夫斯基', source: '当当网', rating: '9.4', year: '2020', category: '文学' },
+  { title: '呼啸山庄', author: '艾米莉·勃朗特', source: '当当网', rating: '8.9', year: '2018', category: '文学' },
+
+  // 社科历史
+  { title: '人类简史', author: '尤瓦尔·赫拉利', source: '京东', rating: '9.1', year: '2022', category: '社科' },
+  { title: '中国哲学简史', author: '冯友兰', source: '豆瓣', rating: '9.3', year: '2024', category: '社科' },
+  { title: '万历十五年', author: '黄仁宇', source: '当当网', rating: '9.2', year: '2022', category: '历史' },
+  { title: '明朝那些事儿', author: '当年明月', source: '京东', rating: '9.2', year: '2023', category: '历史' },
+  { title: '全球通史', author: '斯塔夫里阿诺斯', source: '当当网', rating: '9.0', year: '2021', category: '历史' },
+  { title: '乌合之众', author: '古斯塔夫·勒庞', source: '京东', rating: '8.6', year: '2023', category: '社科' },
+  { title: '社会心理学', author: '戴维·迈尔斯', source: '京东', rating: '9.2', year: '2022', category: '社科' },
+  { title: '乡土中国', author: '费孝通', source: '当当网', rating: '9.0', year: '2023', category: '社科' },
+  { title: '枪炮、病菌与钢铁', author: '贾雷德·戴蒙德', source: '当当网', rating: '9.1', year: '2021', category: '社科' },
+
+  // 心理学
+  { title: '被讨厌的勇气', author: '岸见一郎', source: '当当网', rating: '8.8', year: '2023', category: '心理' },
+  { title: '蛤蟆先生去看心理医生', author: '罗伯特·戴博德', source: '豆瓣', rating: '8.7', year: '2024', category: '心理' },
+  { title: '自卑与超越', author: '阿德勒', source: '豆瓣', rating: '8.7', year: '2024', category: '心理' },
+  { title: '思考快与慢', author: '丹尼尔·卡尼曼', source: '当当网', rating: '9.1', year: '2022', category: '心理' },
+  { title: '亲密关系', author: '罗兰·米勒', source: '当当网', rating: '9.0', year: '2023', category: '心理' },
+  { title: '非暴力沟通', author: '马歇尔·卢森堡', source: '豆瓣', rating: '8.9', year: '2024', category: '心理' },
+  { title: '影响力', author: '罗伯特·西奥迪尼', source: '豆瓣', rating: '8.9', year: '2024', category: '心理' },
+
+  // 思维成长
+  { title: '认知觉醒', author: '周岭', source: '豆瓣', rating: '8.6', year: '2024', category: '成长' },
+  { title: '原则', author: '瑞·达利欧', source: '京东', rating: '8.9', year: '2022', category: '成长' },
+  { title: '穷爸爸富爸爸', author: '罗伯特·清崎', source: '当当网', rating: '8.5', year: '2023', category: '成长' },
+  { title: '高效能人士的七个习惯', author: '史蒂芬·柯维', source: '京东', rating: '9.0', year: '2021', category: '成长' },
+  { title: '刻意练习', author: '安德斯·艾利克森', source: '京东', rating: '8.8', year: '2023', category: '成长' },
+  { title: '终身成长', author: '卡罗尔·德韦克', source: '当当网', rating: '8.7', year: '2024', category: '成长' },
+  { title: '深度工作', author: '卡尔·纽波特', source: '当当网', rating: '8.6', year: '2023', category: '成长' },
+  { title: '原子习惯', author: '詹姆斯·克利尔', source: '豆瓣', rating: '9.0', year: '2024', category: '成长' },
+
+  // 经管商业
+  { title: '置身事内', author: '兰小欢', source: '豆瓣', rating: '9.1', year: '2024', category: '经管' },
+  { title: '薛兆丰经济学讲义', author: '薛兆丰', source: '当当网', rating: '8.8', year: '2023', category: '经管' },
+  { title: '牛奶可乐经济学', author: '罗伯特·弗兰克', source: '当当网', rating: '8.5', year: '2022', category: '经管' },
+  { title: '从零到一', author: '彼得·蒂尔', source: '京东', rating: '8.6', year: '2023', category: '经管' },
+  { title: '创业维艰', author: '本·霍洛维茨', source: '当当网', rating: '9.0', year: '2021', category: '经管' },
+  { title: '价值', author: '张磊', source: '当当网', rating: '8.7', year: '2023', category: '经管' },
+
+  // 科技编程
+  { title: 'Python编程 从入门到实践', author: '埃里克·马瑟斯', source: '京东', rating: '9.0', year: '2023', category: '技术' },
+  { title: '设计模式', author: '程杰', source: '当当网', rating: '9.4', year: '2020', category: '技术' },
+  { title: 'JavaScript高级程序设计', author: '马特·弗劳恩', source: '京东', rating: '9.2', year: '2023', category: '技术' },
+  { title: '算法导论', author: '托马斯·科尔曼', source: '当当网', rating: '9.3', year: '2022', category: '技术' },
+  { title: '深入理解计算机系统', author: '布莱恩·里森', source: '京东', rating: '9.4', year: '2023', category: '技术' },
+  { title: 'Python爬虫实战', author: '崔庆才', source: '豆瓣', rating: '8.8', year: '2024', category: '技术' },
+  { title: '机器学习', author: '周志华', source: '当当网', rating: '9.2', year: '2022', category: '技术' },
+  { title: '深度学习入门', author: '斋藤康毅', source: '京东', rating: '9.0', year: '2023', category: '技术' },
+];
 
     let currentCategory = '全部';
 

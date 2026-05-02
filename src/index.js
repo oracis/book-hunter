@@ -77,7 +77,6 @@ const ZLIB_DOMAINS = [
   { name: 'z-lib.fm', note: '主域名', color: '#667eea' },
   { name: 'zh.z-lib.fm', note: '中文镜像', color: '#764ba2' },
   { name: '1lib.domains', note: '备用域名', color: '#11998e' },
-  { name: 'b-ok.cc', note: '旧域名', color: '#f093fb' },
 ];
 
 // 搜索函数
@@ -299,6 +298,34 @@ const HTML = `<!DOCTYPE html>
       color: #b77a00; line-height: 1.5;
     }
 
+    .no-proxy-section {
+      background: #f0f7ff; border-radius: 12px;
+      padding: 14px 16px; margin-bottom: 12px;
+    }
+    .no-proxy-title { font-size: 0.9rem; font-weight: 600; color: #1a73e8; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .no-proxy-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 0; border-bottom: 1px solid #e8f0fe;
+    }
+    .no-proxy-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .no-proxy-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+    .no-proxy-text { flex: 1; }
+    .no-proxy-text strong { font-size: 0.88rem; color: #333; display: block; margin-bottom: 2px; }
+    .no-proxy-text span { font-size: 0.78rem; color: #666; line-height: 1.4; }
+    .no-proxy-btn {
+      background: #1a73e8; color: white; text-decoration: none;
+      padding: 4px 10px; border-radius: 14px;
+      font-size: 0.75rem; font-weight: 500; flex-shrink: 0; white-space: nowrap;
+    }
+    .no-proxy-btn:hover { background: #1557b0; }
+    .email-box {
+      background: #fff3e0; border-radius: 10px;
+      padding: 10px 14px; margin-top: 10px;
+      font-size: 0.8rem; color: #555;
+    }
+    .email-box strong { color: #e65100; }
+    .email-box a { color: #1a73e8; font-weight: 600; }
+
     .modal-close {
       position: absolute; top: 16px; right: 20px;
       background: none; border: none; color: rgba(255,255,255,0.7);
@@ -352,21 +379,66 @@ const HTML = `<!DOCTYPE html>
       <div class="modal-body">
         <div class="modal-book-title" id="modalBookTitle"></div>
 
-        <div class="modal-section-title">Z-Library 镜像域名（需代理）</div>
+        <div class="modal-section-title">📡 Z-Library 镜像域名</div>
         <div class="mirror-list" id="mirrorList"></div>
 
-        <div class="tor-section">
-          <div class="tor-title">🌐 无代理访问 — Tor 浏览器</div>
-          <div class="tor-desc">
-            Z-Library 的 .onion 地址可通过 <a class="tor-link" href="https://www.torproject.org/download/" target="_blank">Tor Browser</a> 直接访问，全程加密，无需代理。
-            <br>访问 <a class="tor-link" href="https://zlibrary-official.com" target="_blank">zlibrary-official.com</a> 查找最新 .onion 地址。
+        <div class="no-proxy-section">
+          <div class="no-proxy-title">🌐 无代理访问方式</div>
+
+          <div class="no-proxy-item">
+            <span class="no-proxy-icon">📧</span>
+            <div class="no-proxy-text">
+              <strong>Magic Email 邮件获取</strong>
+              <span>发任意邮件到 blackbox@z-library.se，自动收到个人访问链接</span>
+            </div>
+            <a href="mailto:blackbox@z-library.se" class="no-proxy-btn">发邮件</a>
+          </div>
+
+          <div class="no-proxy-item">
+            <span class="no-proxy-icon">🦊</span>
+            <div class="no-proxy-text">
+              <strong>Firefox 浏览器扩展</strong>
+              <span>安装 Z-Library Browser Companion 扩展，自动处理域名切换</span>
+            </div>
+            <a href="https://addons.mozilla.org/zh-CN/firefox/addon/zlibrary-browser-companion/" target="_blank" class="no-proxy-btn">获取</a>
+          </div>
+
+          <div class="no-proxy-item">
+            <span class="no-proxy-icon">🌑</span>
+            <div class="no-proxy-text">
+              <strong>Tor Browser（暗网 .onion）</strong>
+              <span>下载 Tor Browser，访问 Z-Library .onion 地址，无需任何代理</span>
+            </div>
+            <a href="https://www.torproject.org/download/" target="_blank" class="no-proxy-btn">下载</a>
+          </div>
+
+          <div class="no-proxy-item">
+            <span class="no-proxy-icon">🌐</span>
+            <div class="no-proxy-text">
+              <strong>Z-Access 聚合页</strong>
+              <span>官方提供的最新可用域名汇总页面</span>
+            </div>
+            <a href="https://zaccess.pages.dev/" target="_blank" class="no-proxy-btn">访问</a>
+          </div>
+
+          <div class="no-proxy-item">
+            <span class="no-proxy-icon">📮</span>
+            <div class="no-proxy-text">
+              <strong>Reddit 社区</strong>
+              <span>r/zlibrary 社区用户分享最新可用域名和访问方法</span>
+            </div>
+            <a href="https://www.reddit.com/r/zlibrary/" target="_blank" class="no-proxy-btn">查看</a>
+          </div>
+
+          <div class="email-box">
+            💡 <strong>最简单方法：</strong>发一封邮件到
+            <a href="mailto:blackbox@z-library.se">blackbox@z-library.se</a>
+            （任意主题/正文），几秒内收到回复，内含个人访问链接。
           </div>
         </div>
 
         <div class="mirror-tip">
-          💡 <strong>提示：</strong>Z-Library 域名可能随时变化。如遇链接失效，请访问
-          <a href="https://zlibrary-official.com" target="_blank" style="color:#b77a00;">zlibrary-official.com</a>
-          获取最新域名。
+          💡 域名可能随时变化失效，推荐使用上方 <strong>无代理访问方式</strong> 获取最新链接。
         </div>
       </div>
     </div>
