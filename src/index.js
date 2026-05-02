@@ -421,7 +421,7 @@ const HTML = `<!DOCTYPE html>
               <strong>Z-Access 聚合页</strong>
               <span>官方提供的最新可用域名汇总页面</span>
             </div>
-            <a href="https://zaccess.pages.dev/" target="_blank" class="no-proxy-btn">访问</a>
+            <a href="https://library-access.sk/" target="_blank" class="no-proxy-btn">访问</a>
           </div>
 
           <div class="no-proxy-item">
