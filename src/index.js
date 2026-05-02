@@ -1,64 +1,114 @@
 /**
- * Book Hunter - 国内热门书籍实时搜索
- * Cloudflare Workers 后端
+ * Book Hunter - 书海猎手
+ * Cloudflare Workers 后端 + 内嵌前端
+ * 功能：热门书籍展示 + Z-Library 多域名下载入口
  */
 
-// 模拟书籍数据
-const MOCK_BOOKS = [
-  { title: '活着', author: '余华', source: '当当网', rating: '9.4' },
-  { title: '平凡的世界', author: '路遥', source: '当当网', rating: '9.0' },
-  { title: '三体', author: '刘慈欣', source: '豆瓣', rating: '9.5' },
-  { title: '人类简史', author: '尤瓦尔·赫拉利', source: '京东', rating: '9.1' },
-  { title: '被讨厌的勇气', author: '岸见一郎', source: '当当网', rating: '8.8' },
-  { title: '认知觉醒', author: '周岭', source: '豆瓣', rating: '8.6' },
-  { title: '百年孤独', author: '加西亚·马尔克斯', source: '当当网', rating: '9.3' },
-  { title: '明朝那些事儿', author: '当年明月', source: '京东', rating: '9.2' },
-  { title: '小王子', author: '圣埃克苏佩里', source: '当当网', rating: '9.7' },
-  { title: '解忧杂货店', author: '东野圭吾', source: '豆瓣', rating: '8.5' },
-  { title: 'Python编程 从入门到实践', author: '埃里克·马瑟斯', source: '京东', rating: '9.0' },
-  { title: '设计模式下', author: '程杰', source: '当当网', rating: '9.4' },
-  { title: 'JavaScript高级程序设计', author: '马特·弗劳恩', source: '京东', rating: '9.2' },
-  { title: '蛤蟆先生去看心理医生', author: '罗伯特·戴博德', source: '豆瓣', rating: '8.7' },
-  { title: '追风筝的人', author: '卡勒德·胡赛尼', source: '当当网', rating: '9.1' },
-  { title: '遥远的救世主', author: '豆豆', source: '当当网', rating: '8.8' },
-  { title: '置身事内', author: '兰小欢', source: '豆瓣', rating: '9.1' },
-  { title: '原则', author: '瑞·达利欧', source: '京东', rating: '8.9' },
-  { title: '穷爸爸富爸爸', author: '罗伯特·清崎', source: '当当网', rating: '8.5' },
-  { title: '高效能人士的七个习惯', author: '史蒂芬·柯维', source: '京东', rating: '9.0' },
-  { title: '中国哲学简史', author: '冯友兰', source: '豆瓣', rating: '9.3' },
-  { title: '万历十五年', author: '黄仁宇', source: '当当网', rating: '9.2' },
-  { title: '乌合之众', author: '古斯塔夫·勒庞', source: '京东', rating: '8.6' },
-  { title: '自卑与超越', author: '阿德勒', source: '豆瓣', rating: '8.7' },
-  { title: '思考快与慢', author: '丹尼尔·卡尼曼', source: '当当网', rating: '9.1' },
-  { title: '刻意练习', author: '安德斯·艾利克森', source: '京东', rating: '8.8' },
-  { title: '非暴力沟通', author: '马歇尔·卢森堡', source: '豆瓣', rating: '8.9' },
-  { title: '亲密关系', author: '罗兰·米勒', source: '当当网', rating: '9.0' },
-  { title: '社会心理学', author: '戴维·迈尔斯', source: '京东', rating: '9.2' },
-  { title: '影响力', author: '罗伯特·西奥迪尼', source: '豆瓣', rating: '8.9' },
+// 书籍数据库（50本，分类标注）
+const BOOKS = [
+  // 文学经典
+  { title: '活着', author: '余华', source: '当当网', rating: '9.4', year: '2012', category: '文学' },
+  { title: '平凡的世界', author: '路遥', source: '当当网', rating: '9.0', year: '2017', category: '文学' },
+  { title: '三体', author: '刘慈欣', source: '豆瓣', rating: '9.5', year: '2021', category: '科幻' },
+  { title: '百年孤独', author: '加西亚·马尔克斯', source: '当当网', rating: '9.3', year: '2011', category: '文学' },
+  { title: '小王子', author: '圣埃克苏佩里', source: '当当网', rating: '9.7', year: '2018', category: '文学' },
+  { title: '追风筝的人', author: '卡勒德·胡赛尼', source: '当当网', rating: '9.1', year: '2019', category: '文学' },
+  { title: '解忧杂货店', author: '东野圭吾', source: '豆瓣', rating: '8.5', year: '2024', category: '文学' },
+  { title: '挪威的森林', author: '村上春树', source: '当当网', rating: '8.8', year: '2020', category: '文学' },
+  { title: '月亮与六便士', author: '毛姆', source: '当当网', rating: '9.0', year: '2019', category: '文学' },
+  { title: '局外人', author: '加缪', source: '当当网', rating: '9.1', year: '2021', category: '文学' },
+  { title: '卡拉马佐夫兄弟', author: '陀思妥耶夫斯基', source: '当当网', rating: '9.4', year: '2020', category: '文学' },
+  { title: '呼啸山庄', author: '艾米莉·勃朗特', source: '当当网', rating: '8.9', year: '2018', category: '文学' },
+
+  // 社科历史
+  { title: '人类简史', author: '尤瓦尔·赫拉利', source: '京东', rating: '9.1', year: '2022', category: '社科' },
+  { title: '中国哲学简史', author: '冯友兰', source: '豆瓣', rating: '9.3', year: '2024', category: '社科' },
+  { title: '万历十五年', author: '黄仁宇', source: '当当网', rating: '9.2', year: '2022', category: '历史' },
+  { title: '明朝那些事儿', author: '当年明月', source: '京东', rating: '9.2', year: '2023', category: '历史' },
+  { title: '全球通史', author: '斯塔夫里阿诺斯', source: '当当网', rating: '9.0', year: '2021', category: '历史' },
+  { title: '乌合之众', author: '古斯塔夫·勒庞', source: '京东', rating: '8.6', year: '2023', category: '社科' },
+  { title: '社会心理学', author: '戴维·迈尔斯', source: '京东', rating: '9.2', year: '2022', category: '社科' },
+  { title: '乡土中国', author: '费孝通', source: '当当网', rating: '9.0', year: '2023', category: '社科' },
+  { title: '枪炮、病菌与钢铁', author: '贾雷德·戴蒙德', source: '当当网', rating: '9.1', year: '2021', category: '社科' },
+
+  // 心理学
+  { title: '被讨厌的勇气', author: '岸见一郎', source: '当当网', rating: '8.8', year: '2023', category: '心理' },
+  { title: '蛤蟆先生去看心理医生', author: '罗伯特·戴博德', source: '豆瓣', rating: '8.7', year: '2024', category: '心理' },
+  { title: '自卑与超越', author: '阿德勒', source: '豆瓣', rating: '8.7', year: '2024', category: '心理' },
+  { title: '思考快与慢', author: '丹尼尔·卡尼曼', source: '当当网', rating: '9.1', year: '2022', category: '心理' },
+  { title: '亲密关系', author: '罗兰·米勒', source: '当当网', rating: '9.0', year: '2023', category: '心理' },
+  { title: '非暴力沟通', author: '马歇尔·卢森堡', source: '豆瓣', rating: '8.9', year: '2024', category: '心理' },
+  { title: '影响力', author: '罗伯特·西奥迪尼', source: '豆瓣', rating: '8.9', year: '2024', category: '心理' },
+
+  // 思维成长
+  { title: '认知觉醒', author: '周岭', source: '豆瓣', rating: '8.6', year: '2024', category: '成长' },
+  { title: '原则', author: '瑞·达利欧', source: '京东', rating: '8.9', year: '2022', category: '成长' },
+  { title: '穷爸爸富爸爸', author: '罗伯特·清崎', source: '当当网', rating: '8.5', year: '2023', category: '成长' },
+  { title: '高效能人士的七个习惯', author: '史蒂芬·柯维', source: '京东', rating: '9.0', year: '2021', category: '成长' },
+  { title: '刻意练习', author: '安德斯·艾利克森', source: '京东', rating: '8.8', year: '2023', category: '成长' },
+  { title: '终身成长', author: '卡罗尔·德韦克', source: '当当网', rating: '8.7', year: '2024', category: '成长' },
+  { title: '深度工作', author: '卡尔·纽波特', source: '当当网', rating: '8.6', year: '2023', category: '成长' },
+  { title: '原子习惯', author: '詹姆斯·克利尔', source: '豆瓣', rating: '9.0', year: '2024', category: '成长' },
+
+  // 经管商业
+  { title: '置身事内', author: '兰小欢', source: '豆瓣', rating: '9.1', year: '2024', category: '经管' },
+  { title: '薛兆丰经济学讲义', author: '薛兆丰', source: '当当网', rating: '8.8', year: '2023', category: '经管' },
+  { title: '牛奶可乐经济学', author: '罗伯特·弗兰克', source: '当当网', rating: '8.5', year: '2022', category: '经管' },
+  { title: '从零到一', author: '彼得·蒂尔', source: '京东', rating: '8.6', year: '2023', category: '经管' },
+  { title: '创业维艰', author: '本·霍洛维茨', source: '当当网', rating: '9.0', year: '2021', category: '经管' },
+  { title: '价值', author: '张磊', source: '当当网', rating: '8.7', year: '2023', category: '经管' },
+
+  // 科技编程
+  { title: 'Python编程 从入门到实践', author: '埃里克·马瑟斯', source: '京东', rating: '9.0', year: '2023', category: '技术' },
+  { title: '设计模式', author: '程杰', source: '当当网', rating: '9.4', year: '2020', category: '技术' },
+  { title: 'JavaScript高级程序设计', author: '马特·弗劳恩', source: '京东', rating: '9.2', year: '2023', category: '技术' },
+  { title: '算法导论', author: '托马斯·科尔曼', source: '当当网', rating: '9.3', year: '2022', category: '技术' },
+  { title: '深入理解计算机系统', author: '布莱恩·里森', source: '京东', rating: '9.4', year: '2023', category: '技术' },
+  { title: 'Python爬虫实战', author: '崔庆才', source: '豆瓣', rating: '8.8', year: '2024', category: '技术' },
+  { title: '机器学习', author: '周志华', source: '当当网', rating: '9.2', year: '2022', category: '技术' },
+  { title: '深度学习入门', author: '斋藤康毅', source: '京东', rating: '9.0', year: '2023', category: '技术' },
 ];
 
-// 搜索书籍
-function searchBooks(query) {
-  if (!query || query.trim() === '') {
-    return MOCK_BOOKS;
+// 分类列表
+const CATEGORIES = ['全部', '文学', '科幻', '历史', '社科', '心理', '成长', '经管', '技术'];
+
+// Z-Library 域名列表
+const ZLIB_DOMAINS = [
+  { name: 'z-lib.fm', note: '主域名', color: '#667eea' },
+  { name: 'zh.z-lib.fm', note: '中文镜像', color: '#764ba2' },
+  { name: '1lib.domains', note: '备用域名', color: '#11998e' },
+  { name: 'b-ok.cc', note: '旧域名', color: '#f093fb' },
+];
+
+// 搜索函数
+function searchBooks(query, category) {
+  let results = BOOKS;
+
+  // 分类筛选
+  if (category && category !== '全部') {
+    results = results.filter(b => b.category === category);
   }
-  
-  const terms = query.toLowerCase().split(/\s+/);
-  
-  return MOCK_BOOKS.filter(book => {
-    const titleLower = book.title.toLowerCase();
-    const authorLower = (book.author || '').toLowerCase();
-    return terms.some(term => titleLower.includes(term) || authorLower.includes(term));
-  });
+
+  // 关键词搜索
+  if (query && query.trim() !== '') {
+    const terms = query.toLowerCase().split(/\s+/);
+    results = results.filter(book => {
+      const titleLower = book.title.toLowerCase();
+      const authorLower = (book.author || '').toLowerCase();
+      return terms.some(term => titleLower.includes(term) || authorLower.includes(term));
+    });
+  }
+
+  return results;
 }
 
-// 嵌入的前端 HTML
+// 嵌入前端 HTML
 const HTML = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📚 书海猎手 - 国内热门书籍实时搜索</title>
+  <title>📚 书海猎手 - 热门书籍搜索</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -67,120 +117,200 @@ const HTML = `<!DOCTYPE html>
       min-height: 100vh;
       padding: 20px;
     }
-    .container { max-width: 900px; margin: 0 auto; }
-    header { text-align: center; color: white; padding: 40px 0; }
-    header h1 { font-size: 2.5rem; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
-    header p { font-size: 1.1rem; opacity: 0.9; }
+    .container { max-width: 960px; margin: 0 auto; }
+    header { text-align: center; color: white; padding: 30px 0 20px; }
+    header h1 { font-size: 2.2rem; margin-bottom: 8px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+    header p { font-size: 1rem; opacity: 0.85; }
+
     .search-box {
       background: white;
       border-radius: 50px;
-      padding: 8px;
+      padding: 6px;
       display: flex;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-      margin-bottom: 30px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+      margin-bottom: 16px;
     }
     .search-box input {
       flex: 1;
       border: none;
-      padding: 15px 25px;
-      font-size: 1.1rem;
+      padding: 14px 24px;
+      font-size: 1.05rem;
       outline: none;
       border-radius: 50px;
     }
     .search-box button {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
       border: none;
-      padding: 15px 35px;
+      padding: 14px 30px;
       border-radius: 50px;
       font-size: 1rem;
       cursor: pointer;
       font-weight: 600;
       transition: transform 0.2s;
     }
-    .search-box button:hover { transform: scale(1.05); }
-    .stats { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
-    .stat-card {
-      background: rgba(255,255,255,0.2);
-      backdrop-filter: blur(10px);
-      border-radius: 15px;
-      padding: 15px 25px;
-      color: white;
+    .search-box button:hover { transform: scale(1.04); }
+
+    .categories {
       display: flex;
-      align-items: center;
-      gap: 10px;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
     }
-    .stat-card .number { font-size: 1.8rem; font-weight: bold; }
-    .stat-card .label { font-size: 0.9rem; opacity: 0.9; }
-    .results { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.15); }
-    .results-header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .cat-btn {
+      background: rgba(255,255,255,0.18);
+      border: 1.5px solid rgba(255,255,255,0.35);
       color: white;
-      padding: 15px 25px;
+      padding: 6px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      transition: all 0.2s;
+    }
+    .cat-btn:hover, .cat-btn.active {
+      background: rgba(255,255,255,0.9);
+      color: #667eea;
+      border-color: transparent;
+      font-weight: 600;
+    }
+
+    .results { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.14); }
+    .results-header {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 14px 22px;
       display: flex;
       justify-content: space-between;
+      align-items: center;
+      font-size: 0.95rem;
     }
-    .results-list { max-height: 600px; overflow-y: auto; }
+    .results-list { max-height: 65vh; overflow-y: auto; }
+
     .book-item {
       display: flex;
       align-items: center;
-      padding: 20px 25px;
-      border-bottom: 1px solid #eee;
-      transition: background 0.2s;
+      padding: 16px 22px;
+      border-bottom: 1px solid #f0f0f5;
+      transition: background 0.15s;
     }
     .book-item:hover { background: #f8f9ff; }
     .book-item:last-child { border-bottom: none; }
+
     .book-rank {
-      width: 40px;
-      height: 40px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      margin-right: 20px;
-      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold; font-size: 0.85rem;
+      margin-right: 16px; flex-shrink: 0;
     }
-    .book-rank.top3 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .book-rank.top3 { background: linear-gradient(135deg, #f093fb, #f5576c); }
+
     .book-info { flex: 1; min-width: 0; }
-    .book-title { font-size: 1.1rem; font-weight: 600; color: #333; margin-bottom: 5px; }
-    .book-meta { display: flex; gap: 15px; font-size: 0.9rem; color: #666; }
-    .book-meta span { display: flex; align-items: center; gap: 5px; }
-    .book-source {
-      background: #e8eaff;
-      color: #667eea;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 500;
-      margin-right: 15px;
-      flex-shrink: 0;
+    .book-title {
+      font-size: 1.02rem; font-weight: 600; color: #222;
+      margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .book-download {
-      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-      color: white;
-      padding: 8px 18px;
-      border-radius: 25px;
-      text-decoration: none;
-      font-size: 0.85rem;
-      font-weight: 500;
-      transition: transform 0.2s, box-shadow 0.2s;
-      flex-shrink: 0;
+    .book-meta { display: flex; gap: 12px; font-size: 0.82rem; color: #888; flex-wrap: wrap; }
+    .book-meta span { display: flex; align-items: center; gap: 3px; }
+    .book-cat {
+      background: #e8eaff; color: #667eea;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 0.75rem; font-weight: 600;
+      margin-right: 10px; flex-shrink: 0;
     }
-    .book-download:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(17, 153, 142, 0.4);
-      color: white;
+
+    .download-btn {
+      background: linear-gradient(135deg, #11998e, #38ef7d);
+      color: white; border: none;
+      padding: 8px 16px; border-radius: 22px;
+      font-size: 0.82rem; font-weight: 500;
+      cursor: pointer; flex-shrink: 0;
+      transition: all 0.2s;
+      position: relative;
     }
-    footer { text-align: center; color: white; opacity: 0.8; padding: 30px 0; font-size: 0.9rem; }
-    footer a { color: white; text-decoration: underline; }
-    @media (max-width: 768px) {
-      header h1 { font-size: 1.8rem; }
+    .download-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(17,153,142,0.4); }
+
+    .empty {
+      text-align: center; padding: 60px; color: #aaa;
+      font-size: 1.1rem;
+    }
+    .empty-icon { font-size: 3.5rem; margin-bottom: 12px; }
+
+    footer { text-align: center; color: rgba(255,255,255,0.7); padding: 24px 0 10px; font-size: 0.85rem; }
+    footer a { color: rgba(255,255,255,0.9); text-decoration: underline; }
+
+    /* 下载弹窗 */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55); z-index: 999;
+      align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: white; border-radius: 20px;
+      max-width: 420px; width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    .modal-header {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white; padding: 20px 24px;
+    }
+    .modal-header h3 { font-size: 1.15rem; margin-bottom: 4px; }
+    .modal-header p { font-size: 0.82rem; opacity: 0.85; }
+    .modal-body { padding: 20px 24px; }
+    .modal-book-title { font-size: 1.05rem; font-weight: 600; color: #333; margin-bottom: 16px; }
+    .modal-section-title { font-size: 0.78rem; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+
+    .mirror-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+    .mirror-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: 12px;
+      border: 1.5px solid #eee; transition: all 0.2s;
+    }
+    .mirror-item:hover { border-color: #667eea; background: #f8f9ff; }
+    .mirror-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .mirror-name { flex: 1; font-size: 0.9rem; color: #333; font-weight: 500; }
+    .mirror-note { font-size: 0.75rem; color: #aaa; }
+    .mirror-link {
+      background: linear-gradient(135deg, #11998e, #38ef7d);
+      color: white; text-decoration: none;
+      padding: 5px 12px; border-radius: 16px;
+      font-size: 0.78rem; font-weight: 500;
+      transition: transform 0.2s;
+    }
+    .mirror-link:hover { transform: scale(1.05); color: white; }
+
+    .tor-section {
+      background: #f8f5ff; border-radius: 12px;
+      padding: 14px 16px; margin-bottom: 14px;
+    }
+    .tor-title { font-size: 0.9rem; font-weight: 600; color: #764ba2; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .tor-desc { font-size: 0.8rem; color: #888; line-height: 1.5; }
+    .tor-link { color: #764ba2; font-weight: 600; text-decoration: none; }
+    .tor-link:hover { text-decoration: underline; }
+
+    .mirror-tip {
+      background: #fffbe6; border-radius: 10px;
+      padding: 10px 14px; font-size: 0.8rem;
+      color: #b77a00; line-height: 1.5;
+    }
+
+    .modal-close {
+      position: absolute; top: 16px; right: 20px;
+      background: none; border: none; color: rgba(255,255,255,0.7);
+      font-size: 1.4rem; cursor: pointer; line-height: 1;
+    }
+    .modal-close:hover { color: white; }
+    .modal { position: relative; }
+
+    @media (max-width: 640px) {
+      header h1 { font-size: 1.6rem; }
       .book-item { flex-wrap: wrap; }
-      .book-download { margin-top: 15px; width: 100%; justify-content: center; }
-      .stats { justify-content: center; }
+      .download-btn { margin-top: 10px; width: 100%; text-align: center; }
     }
   </style>
 </head>
@@ -188,89 +318,185 @@ const HTML = `<!DOCTYPE html>
   <div class="container">
     <header>
       <h1>📚 书海猎手</h1>
-      <p>国内热门书籍实时搜索 · 支持当当/豆瓣/京东</p>
+      <p>精选热门书籍 · Z-Library 多域名下载入口</p>
     </header>
+
     <div class="search-box">
-      <input type="text" id="searchInput" placeholder="搜索书名、作者... (如：活着 余华)" autofocus>
-      <button onclick="searchBooks()">🔍 搜索</button>
+      <input type="text" id="searchInput" placeholder="搜索书名、作者... (如：三体 刘慈欣）" autofocus>
+      <button onclick="doSearch()">🔍 搜索</button>
     </div>
-    <div class="stats">
-      <div class="stat-card">
-        <span class="number" id="totalBooks">30</span>
-        <span class="label">本书籍</span>
-      </div>
-      <div class="stat-card">
-        <span class="number">3</span>
-        <span class="label">个来源</span>
-      </div>
-      <div class="stat-card">
-        <span class="number">刚刚</span>
-        <span class="label">更新</span>
-      </div>
-    </div>
+
+    <div class="categories" id="catContainer"></div>
+
     <div class="results">
       <div class="results-header">
-        <span>📖 搜索结果</span>
-        <span id="resultCount">共 30 本</span>
+        <span id="resultLabel">📖 全部书籍</span>
+        <span id="resultCount">共 0 本</span>
       </div>
       <div class="results-list" id="resultsList"></div>
     </div>
+
     <footer>
-      <p>Powered by <a href="https://workers.cloudflare.com" target="_blank">Cloudflare Workers</a></p>
+      <p>数据来源：当当网 / 豆瓣 / 京东 &nbsp;|&nbsp; 下载支持 <a href="https://zlibrary-official.com" target="_blank">Z-Library</a> · <a href="https://www.torproject.org/download/" target="_blank">Tor Browser</a></p>
     </footer>
   </div>
+
+  <!-- 下载弹窗 -->
+  <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-header">
+        <button class="modal-close" onclick="closeModal()">×</button>
+        <h3>📥 获取这本书</h3>
+        <p id="modalBookAuthor"></p>
+      </div>
+      <div class="modal-body">
+        <div class="modal-book-title" id="modalBookTitle"></div>
+
+        <div class="modal-section-title">Z-Library 镜像域名（需代理）</div>
+        <div class="mirror-list" id="mirrorList"></div>
+
+        <div class="tor-section">
+          <div class="tor-title">🌐 无代理访问 — Tor 浏览器</div>
+          <div class="tor-desc">
+            Z-Library 的 .onion 地址可通过 <a class="tor-link" href="https://www.torproject.org/download/" target="_blank">Tor Browser</a> 直接访问，全程加密，无需代理。
+            <br>访问 <a class="tor-link" href="https://zlibrary-official.com" target="_blank">zlibrary-official.com</a> 查找最新 .onion 地址。
+          </div>
+        </div>
+
+        <div class="mirror-tip">
+          💡 <strong>提示：</strong>Z-Library 域名可能随时变化。如遇链接失效，请访问
+          <a href="https://zlibrary-official.com" target="_blank" style="color:#b77a00;">zlibrary-official.com</a>
+          获取最新域名。
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
-    const API_BASE = '';
-    const MOCK_BOOKS = ${JSON.stringify(MOCK_BOOKS)};
-    
+    const CATEGORIES = ${JSON.stringify(CATEGORIES)};
+    const ZLIB_DOMAINS = ${JSON.stringify(ZLIB_DOMAINS)};
+    const BOOKS = ${JSON.stringify(BOOKS)};
+
+    let currentCategory = '全部';
+
+    // 渲染分类标签
+    function renderCategories() {
+      const container = document.getElementById('catContainer');
+      container.innerHTML = CATEGORIES.map(cat =>
+        '<button class="cat-btn' + (cat === currentCategory ? ' active' : '') + '" onclick="setCategory(\\'' + cat + '\\')">' + cat + '</button>'
+      ).join('');
+    }
+
+    // 设置分类
+    function setCategory(cat) {
+      currentCategory = cat;
+      renderCategories();
+      doSearch();
+    }
+
+    // 搜索 + 筛选
+    function doSearch() {
+      const query = document.getElementById('searchInput').value.trim();
+      let results = BOOKS;
+
+      if (currentCategory !== '全部') {
+        results = results.filter(b => b.category === currentCategory);
+      }
+
+      if (query) {
+        const terms = query.toLowerCase().split(/\\s+/);
+        results = results.filter(book => {
+          const tl = book.title.toLowerCase();
+          const al = (book.author || '').toLowerCase();
+          return terms.some(t => tl.includes(t) || al.includes(t));
+        });
+      }
+
+      renderBooks(results, query);
+
+      const catText = currentCategory === '全部' ? '全部书籍' : currentCategory;
+      document.getElementById('resultLabel').textContent = query ? '🔍 搜索结果' : '📖 ' + catText;
+      document.getElementById('resultCount').textContent = '共 ' + results.length + ' 本';
+    }
+
+    // 渲染书籍列表
     function renderBooks(books, query) {
-      const resultsList = document.getElementById('resultsList');
-      document.getElementById('totalBooks').textContent = books.length;
-      document.getElementById('resultCount').textContent = '共 ' + books.length + ' 本';
-      
-      if (!books || books.length === 0) {
-        resultsList.innerHTML = '<div style="text-align:center;padding:60px;color:#999;">🔍 未找到相关书籍</div>';
+      const list = document.getElementById('resultsList');
+
+      if (!books.length) {
+        list.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div>未找到相关书籍</div>';
         return;
       }
-      
-      resultsList.innerHTML = books.map((book, index) => \`
-        <div class="book-item">
-          <div class="book-rank \${index < 3 ? 'top3' : ''}">\${index + 1}</div>
-          <div class="book-info">
-            <div class="book-title">\${highlight(book.title, query)}</div>
-            <div class="book-meta">
-              <span>👤 \${book.author || '未知作者'}</span>
-              \${book.rating ? \`<span>⭐ \${book.rating}</span>\` : ''}
-            </div>
-          </div>
-          <span class="book-source">\${book.source}</span>
-          <a href="https://z-lib.fm/s/?q=\${encodeURIComponent(book.title)}" target="_blank" class="book-download">📥 下载</a>
-        </div>
-      \`).join('');
+
+      list.innerHTML = books.map((b, i) => {
+        const rank = i + 1;
+        const topCls = rank <= 3 ? ' top3' : '';
+        return '<div class="book-item">' +
+          '<div class="book-rank' + topCls + '">' + rank + '</div>' +
+          '<div class="book-info">' +
+            '<div class="book-title">' + highlight(b.title, query) + '</div>' +
+            '<div class="book-meta">' +
+              '<span>👤 ' + (b.author || '未知') + '</span>' +
+              (b.rating ? '<span>⭐ ' + b.rating + '</span>' : '') +
+              (b.year ? '<span>📅 ' + b.year + '</span>' : '') +
+            '</div>' +
+          '</div>' +
+          '<span class="book-cat">' + b.category + '</span>' +
+          '<button class="download-btn" onclick="openModal(\\'' + escapeQuote(b.title) + '\\', \\'' + escapeQuote(b.author) + '\\')">📥 下载</button>' +
+        '</div>';
+      }).join('');
     }
-    
+
+    // 高亮关键词
     function highlight(text, query) {
       if (!query) return text;
-      const regex = new RegExp('(' + query.split(/\\s+/).join('|') + ')', 'gi');
-      return text.replace(regex, '<mark style="background:#ffd700;padding:0 2px;">$1</mark>');
+      const terms = query.trim().split(/\\s+/).join('|');
+      return text.replace(new RegExp('(' + terms + ')', 'gi'),
+        '<mark style="background:#ffd700;padding:0 2px;border-radius:3px;">$1</mark>');
     }
-    
-    function searchBooks() {
-      const query = document.getElementById('searchInput').value.trim();
-      const results = query ? MOCK_BOOKS.filter(book => {
-        const titleLower = book.title.toLowerCase();
-        const authorLower = (book.author || '').toLowerCase();
-        const terms = query.toLowerCase().split(/\\s+/);
-        return terms.some(term => titleLower.includes(term) || authorLower.includes(term));
-      }) : MOCK_BOOKS;
-      renderBooks(results, query);
+
+    // 转义单引号
+    function escapeQuote(str) {
+      return (str || '').replace(/'/g, "\\'");
     }
-    
+
+    // 打开下载弹窗
+    function openModal(title, author) {
+      document.getElementById('modalBookTitle').textContent = title;
+      document.getElementById('modalBookAuthor').textContent = '👤 ' + (author || '未知作者');
+
+      // 渲染镜像列表
+      const mirrorList = document.getElementById('mirrorList');
+      mirrorList.innerHTML = ZLIB_DOMAINS.map(d => {
+        const searchUrl = 'https://' + d.name + '/s/?q=' + encodeURIComponent(title);
+        return '<div class="mirror-item">' +
+          '<span class="mirror-dot" style="background:' + d.color + '"></span>' +
+          '<span class="mirror-name">' + d.name + '</span>' +
+          '<span class="mirror-note">' + d.note + '</span>' +
+          '<a href="' + searchUrl + '" target="_blank" class="mirror-link">搜索→</a>' +
+        '</div>';
+      }).join('');
+
+      document.getElementById('modalOverlay').classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('show');
+    }
+
+    // 回车搜索
     document.getElementById('searchInput').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') searchBooks();
+      if (e.key === 'Enter') doSearch();
     });
-    
-    renderBooks(MOCK_BOOKS, '');
+
+    // ESC 关闭弹窗
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // 初始化
+    renderCategories();
+    doSearch();
   </script>
 </body>
 </html>`;
@@ -279,23 +505,45 @@ export default {
   async fetch(request) {
     const url = new URL(request.url);
     const path = url.pathname;
-    
+
     // API: 搜索
     if (path === '/api/search') {
       const query = url.searchParams.get('q') || '';
-      const books = searchBooks(query);
-      return new Response(JSON.stringify({ success: true, query, total: books.length, books }), {
+      const category = url.searchParams.get('cat') || '全部';
+      const books = searchBooks(query, category);
+      return new Response(JSON.stringify({
+        success: true,
+        query,
+        category,
+        total: books.length,
+        books
+      }), {
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
       });
     }
-    
+
+    // API: 全部书籍
+    if (path === '/api/books') {
+      return new Response(JSON.stringify({
+        success: true,
+        total: BOOKS.length,
+        books: BOOKS
+      }), {
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+      });
+    }
+
     // API: 健康检查
     if (path === '/api/health') {
-      return new Response(JSON.stringify({ status: 'ok', timestamp: new Date().toISOString() }), {
+      return new Response(JSON.stringify({
+        status: 'ok',
+        domains: ZLIB_DOMAINS,
+        timestamp: new Date().toISOString()
+      }), {
         headers: { 'Content-Type': 'application/json' }
       });
     }
-    
+
     // 默认：返回 HTML
     return new Response(HTML, {
       headers: { 'Content-Type': 'text/html; charset=utf-8' }
