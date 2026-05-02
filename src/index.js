@@ -251,9 +251,11 @@ const HTML = `<!DOCTYPE html>
     .modal-overlay.show { display: flex; }
     .modal {
       background: white; border-radius: 20px;
-      max-width: 420px; width: 100%;
+      max-width: 520px; width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
       box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      overflow: hidden;
+      position: relative;
     }
     .modal-header {
       background: linear-gradient(135deg, #667eea, #764ba2);
@@ -261,11 +263,11 @@ const HTML = `<!DOCTYPE html>
     }
     .modal-header h3 { font-size: 1.15rem; margin-bottom: 4px; }
     .modal-header p { font-size: 0.82rem; opacity: 0.85; }
-    .modal-body { padding: 20px 24px; }
+    .modal-body { padding: 20px 24px 24px; }
     .modal-book-title { font-size: 1.05rem; font-weight: 600; color: #333; margin-bottom: 16px; }
     .modal-section-title { font-size: 0.78rem; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
 
-    .mirror-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+    .mirror-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
     .mirror-item {
       display: flex; align-items: center; gap: 10px;
       padding: 10px 14px; border-radius: 12px;
@@ -305,14 +307,14 @@ const HTML = `<!DOCTYPE html>
     }
     .no-proxy-title { font-size: 0.9rem; font-weight: 600; color: #1a73e8; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
     .no-proxy-item {
-      display: flex; align-items: flex-start; gap: 10px;
-      padding: 10px 0; border-bottom: 1px solid #e8f0fe;
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 0; border-bottom: 1px solid #e8f0fe;
     }
     .no-proxy-item:last-child { border-bottom: none; padding-bottom: 0; }
-    .no-proxy-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
-    .no-proxy-text { flex: 1; }
-    .no-proxy-text strong { font-size: 0.88rem; color: #333; display: block; margin-bottom: 2px; }
-    .no-proxy-text span { font-size: 0.78rem; color: #666; line-height: 1.4; }
+    .no-proxy-icon { font-size: 1rem; flex-shrink: 0; }
+    .no-proxy-text { flex: 1; min-width: 0; }
+    .no-proxy-text strong { font-size: 0.85rem; color: #333; display: block; }
+    .no-proxy-text span { font-size: 0.75rem; color: #666; line-height: 1.3; display: block; margin-top: 1px; }
     .no-proxy-btn {
       background: #1a73e8; color: white; text-decoration: none;
       padding: 4px 10px; border-radius: 14px;
@@ -321,8 +323,8 @@ const HTML = `<!DOCTYPE html>
     .no-proxy-btn:hover { background: #1557b0; }
     .email-box {
       background: #fff3e0; border-radius: 10px;
-      padding: 10px 14px; margin-top: 10px;
-      font-size: 0.8rem; color: #555;
+      padding: 10px 14px; margin-top: 12px;
+      font-size: 0.78rem; color: #555; line-height: 1.4;
     }
     .email-box strong { color: #e65100; }
     .email-box a { color: #1a73e8; font-weight: 600; }
@@ -333,7 +335,7 @@ const HTML = `<!DOCTYPE html>
       font-size: 1.4rem; cursor: pointer; line-height: 1;
     }
     .modal-close:hover { color: white; }
-    .modal { position: relative; }
+    .modal { position: relative; box-sizing: border-box; }
 
     @media (max-width: 640px) {
       header h1 { font-size: 1.6rem; }
