@@ -1,0 +1,54 @@
+name: Deploy to Aliyun OSS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'public/**'
+      - 'scripts/deploy_oss.py'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # AK/SK 是 RAM 子账号的凭据，权限只限 book-hunter-hk 这一个桶
+    # （2026-05-01 配置）。绝不要改成主账号密钥。
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install oss2
+
+      - name: Upload public/ to OSS
+        # deploy_oss.py 用 os.path.relpath(full, 'public') 做 object key，
+        # 所以 public/index.html -> /index.html、public/favicon/x.png -> /favicon/x.png，
+        # 与 index.html 里 /favicon/xxx 的引用对得上。
+        run: python scripts/deploy_oss.py --dir public
+        env:
+          OSS_ACCESS_KEY_ID: ${{ secrets.OSS_ACCESS_KEY_ID }}
+          OSS_ACCESS_KEY_SECRET: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
+          OSS_BUCKET: ${{ vars.OSS_BUCKET }}
+          OSS_REGION: ${{ vars.OSS_REGION }}
+
+      - name: Verify public access
+        run: python scripts/deploy_oss.py --verify
+        env:
+          OSS_BUCKET: ${{ vars.OSS_BUCKET }}
+          OSS_REGION: ${{ vars.OSS_REGION }}
+
+      - name: Verify favicon reachable
+        # 图标少了不会让部署失败，但标签页会静默变回默认图标，这里显式兜一下
+        run: |
+          base="https://${OSS_BUCKET}.oss-${OSS_REGION}.aliyuncs.com"
+          for p in /index.html /favicon/favicon.svg /favicon/icon-32.png /favicon/apple-touch-icon.png; do
+            code=$(curl -s --noproxy '*' -o /dev/null -w '%{http_code}' "$base$p")
+            echo "$p -> $code"
+            [ "$code" = "200" ] || { echo "ERROR: $p not reachable"; exit 1; }
+          done
+        env:
+          OSS_BUCKET: ${{ vars.OSS_BUCKET }}
+          OSS_REGION: ${{ vars.OSS_REGION }}

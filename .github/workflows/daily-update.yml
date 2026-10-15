@@ -40,3 +40,59 @@ jobs:
           else
             echo "📭 书单无变化，跳过提交"
           fi
+
+      # 把构建产物交给部署 job。用 artifact 而不是让下一个 job 重新
+      # checkout：这样部署的就是本次真正注入过的文件，不受 main 分支
+      # 上「有没有 push 成功」影响（书单无变化时不会产生新提交）。
+      - name: Stage public/ for deploy
+        run: |
+          mkdir -p /tmp/deploy
+          cp -r public/. /tmp/deploy/
+          echo "staged: $(find /tmp/deploy -type f | wc -l) files"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: book-public
+          path: /tmp/deploy
+          retention-days: 1
+
+  # 书单数据是编译进 public/index.html 的（inject_books.py），所以每次
+  # 自动更新后必须重新部署 OSS，否则线上看不到新书。
+  #
+  # 注意：这里用同 workflow 内的 needs: 串联是可行的——GITHUB_TOKEN 的
+  # "不触发其他 workflow" 限制只针对跨 workflow 触发（workflow_run），
+  # 同 workflow 内部的 job 依赖不受影响。
+  deploy-oss:
+    needs: update-books
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: book-public
+          path: deploy-root
+
+      - name: Install dependencies
+        run: pip install oss2
+
+      - name: Upload to OSS
+        run: python scripts/deploy_oss.py --dir deploy-root
+        env:
+          OSS_ACCESS_KEY_ID: ${{ secrets.OSS_ACCESS_KEY_ID }}
+          OSS_ACCESS_KEY_SECRET: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
+          OSS_BUCKET: ${{ vars.OSS_BUCKET }}
+          OSS_REGION: ${{ vars.OSS_REGION }}
+
+      - name: Verify
+        run: python scripts/deploy_oss.py --verify
+        env:
+          OSS_BUCKET: ${{ vars.OSS_BUCKET }}
+          OSS_REGION: ${{ vars.OSS_REGION }}
